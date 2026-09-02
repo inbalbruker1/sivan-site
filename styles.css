@@ -1,0 +1,1883 @@
+/* ==========================================================================
+   סיון חבלצקי — landing page
+   Implementation of Figma frame "Html → Body" (8841:2)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Fonts
+   --------------------------------------------------------------------------
+   Heebo, Assistant and Frank Ruhl Libre are bundled as variable WOFF2.
+   "Carmela" (display) and "Hillel CLM" (logo wordmark) are commercial /
+   non-redistributable faces used in the Figma file. If you drop the licensed
+   web-font files into assets/fonts/ the @font-face rules below pick them up
+   automatically; until then the stack falls back to Assistant / Frank Ruhl
+   Libre, which are the closest freely available Hebrew matches.
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Heebo";
+  src: url("assets/fonts/Heebo.woff2") format("woff2-variations"),
+       url("assets/fonts/Heebo.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url("assets/fonts/Assistant.woff2") format("woff2-variations"),
+       url("assets/fonts/Assistant.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Frank Ruhl Libre";
+  src: url("assets/fonts/FrankRuhlLibre.woff2") format("woff2-variations"),
+       url("assets/fonts/FrankRuhlLibre.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Optional licensed faces — drop the files in and they take over. */
+@font-face {
+  font-family: "Carmela";
+  src: url("assets/fonts/Carmela.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hillel CLM";
+  src: url("assets/fonts/HillelCLM.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --------------------------------------------------------------------------
+   2. Design tokens
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Brand palette */
+  --c-cream:       #f2efe6;
+  --c-sand:        #e9e3d5;
+  --c-forest:      #113b1d;
+  --c-ink:         #2e190f;
+  --c-sage:        #64785c;
+  --c-terracotta:  #b17253;
+  --c-tan:         #d5ccb9;
+  --c-sage-mid:    #617057;
+  --c-sage-light:  #9ba58b;
+
+  /* Semantic */
+  --c-page-bg:      var(--c-cream);
+  --c-text:         var(--c-ink);
+  --c-heading:      var(--c-forest);
+  --c-muted:        var(--c-sage);
+  --c-border:       var(--c-sand);
+  --c-surface:      var(--c-cream);
+  --c-on-dark:      var(--c-cream);
+
+  /* Typography */
+  --font-body:    "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Carmela", "Assistant", "Heebo", system-ui, sans-serif;
+  --font-logo:    "Hillel CLM", "Frank Ruhl Libre", "Heebo", serif;
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+  --fw-bold:    700;
+  --fw-xbold:   800;
+
+  /* Layout */
+  --shell-max:    1240px;   /* 1184px content + 2 × 28px gutter */
+  --shell-pad:    28px;
+  --content-max:  1184px;
+
+  /* Radii */
+  --r-pill:  999px;
+  --r-xl:    18px;
+  --r-lg:    16px;
+  --r-md:    12px;
+  --r-sm:    8px;
+  --r-badge: 10px;
+  --r-media: 14px;
+
+  /* Shadows */
+  --sh-header: 0 6px 24px -16px rgba(72, 48, 22, 0.4);
+  --sh-card:   0 18px 50px -24px rgba(72, 48, 22, 0.3);
+  --sh-soft:   0 2px 10px 0 rgba(72, 48, 22, 0.06);
+  --sh-btn:    0 2px 5px rgba(72, 48, 22, 0.06);
+  --sh-lift:   0 12px 28px -18px rgba(72, 48, 22, 0.45);
+
+  /* Motion */
+  --t-fast:   150ms;
+  --t-base:   220ms;
+  --t-slow:   300ms;
+  --ease:     cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Section rhythm */
+  --sec-pad:  150px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset & base
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  background: var(--c-page-bg);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-weight: var(--fw-regular);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { max-width: 100%; display: block; }
+
+h1, h2, h3, h4, h5, p, figure, blockquote, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--c-terracotta);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 16px;
+  top: -100px;
+  z-index: 1000;
+  background: var(--c-forest);
+  color: var(--c-cream);
+  padding: 12px 20px;
+  border-radius: var(--r-pill);
+  font-weight: var(--fw-bold);
+  transition: top var(--t-base) var(--ease);
+}
+.skip-link:focus-visible { top: 16px; }
+
+.shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
+}
+
+/* --------------------------------------------------------------------------
+   4. Typography primitives
+   -------------------------------------------------------------------------- */
+
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  color: var(--c-heading);
+  font-size: clamp(30px, 3.34vw, 48px);
+  line-height: 1.14;
+  letter-spacing: 0;
+}
+
+.body-lg {
+  font-size: clamp(16px, 1.23vw, 17.6px);
+  line-height: 1.7;
+  color: var(--c-ink);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8.8px;
+  font-family: var(--font-body);
+  font-weight: var(--fw-bold);
+  font-size: 13.1px;
+  line-height: 22.3px;
+  letter-spacing: 2.099px;
+  color: var(--c-sage);
+}
+.eyebrow--center { justify-content: center; }
+.eyebrow--tan { color: var(--c-tan); }
+
+.eyebrow__rule {
+  flex: none;
+  width: 26px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-terracotta);
+}
+.eyebrow--ink .eyebrow__rule { background: var(--c-ink); }
+
+/* --------------------------------------------------------------------------
+   5. Buttons
+   -------------------------------------------------------------------------- */
+
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-forest);
+  --btn-bd: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8.8px;
+  padding: 15.2px 27.2px;
+  border: 1px solid var(--btn-bd);
+  border-radius: var(--r-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-weight: var(--fw-bold);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  filter: drop-shadow(var(--sh-btn));
+  transition:
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease),
+    color var(--t-base) var(--ease),
+    transform var(--t-fast) var(--ease),
+    box-shadow var(--t-base) var(--ease);
+}
+
+.btn__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  transition: transform var(--t-base) var(--ease);
+}
+
+.btn--solid { --btn-bg: var(--c-forest); --btn-fg: var(--c-cream); }
+.btn--ink   { --btn-bg: var(--c-ink);    --btn-fg: var(--c-cream); }
+.btn--ghost { --btn-bg: transparent;     --btn-fg: var(--c-forest); --btn-bd: var(--c-sand);
+              padding: 16.2px 28.2px; filter: none; }
+
+.btn--sm { padding: 9px 18px; font-weight: var(--fw-medium); font-size: 15.2px; line-height: 15.2px; }
+.btn--block { width: 100%; padding: 16.8px; }
+
+.btn:hover { box-shadow: var(--sh-lift); }
+.btn--solid:hover { background: #17512a; }
+.btn--ink:hover   { background: #43281a; }
+.btn--ghost:hover { background: var(--c-sand); border-color: var(--c-tan); box-shadow: none; }
+.btn:hover .btn__icon { transform: translateX(-3px); }
+
+.btn:active { transform: translateY(1px) scale(0.994); box-shadow: none; }
+
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   6. Header
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(242, 239, 230, 0.88);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  box-shadow: var(--sh-header);
+  transition: box-shadow var(--t-slow) var(--ease), background-color var(--t-slow) var(--ease);
+}
+.site-header.is-scrolled {
+  background: rgba(242, 239, 230, 0.96);
+  box-shadow: 0 8px 28px -18px rgba(72, 48, 22, 0.55);
+}
+
+.header__shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 64px;
+  padding-block: 11px;
+}
+
+/* Logo ------------------------------------------------------------------- */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  transition: opacity var(--t-base) var(--ease);
+}
+.logo:hover { opacity: 0.78; }
+
+.logo__mark {
+  display: block;
+  width: 33.59px;
+  height: 42.23px;
+  display: grid;
+  place-items: center;
+}
+.logo__mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.837px;
+  color: var(--c-ink);
+  text-align: center;
+}
+.logo__name {
+  font-family: var(--font-logo);
+  font-weight: 500;
+  font-size: 28.374px;
+  line-height: 26.19px;
+  letter-spacing: -1.4187px;
+  white-space: nowrap;
+}
+.logo__tagline {
+  font-family: var(--font-logo);
+  font-weight: 500;
+  font-size: 11.35px;
+  line-height: 8.916px;
+  letter-spacing: 0.5675px;
+  white-space: nowrap;
+}
+
+/* Nav -------------------------------------------------------------------- */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav__list {
+  display: flex;
+  align-items: center;
+  gap: 25.6px;
+}
+
+.nav__link {
+  position: relative;
+  display: inline-block;
+  font-weight: var(--fw-medium);
+  font-size: 15.2px;
+  line-height: 25.84px;
+  color: var(--c-ink);
+  transition: color var(--t-base) var(--ease);
+}
+.nav__link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 1px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--c-terracotta);
+  transform: scaleX(0);
+  transform-origin: inline-end;
+  transition: transform var(--t-base) var(--ease);
+}
+.nav__link:hover { color: var(--c-forest); }
+.nav__link:hover::after,
+.nav__link:focus-visible::after { transform: scaleX(1); transform-origin: inline-start; }
+.nav__link[aria-current="true"] { color: var(--c-forest); font-weight: var(--fw-semi); }
+.nav__link[aria-current="true"]::after { transform: scaleX(1); }
+.nav__link:active { color: var(--c-sage); }
+
+/* Mobile toggle ---------------------------------------------------------- */
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-pill);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
+}
+.nav-toggle:hover { background: var(--c-sand); }
+.nav-toggle:active { transform: scale(0.96); }
+
+.nav-toggle__bar {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-ink);
+  transition: transform var(--t-base) var(--ease), opacity var(--t-fast) var(--ease);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* --------------------------------------------------------------------------
+   7. Hero
+   -------------------------------------------------------------------------- */
+
+/* Fills the screen below the sticky header at every size. The generous
+   Figma breathing room then comes from centring the content inside that
+   height rather than from a large fixed padding, so short or landscape
+   windows don't end up with a dead band above the headline. */
+.hero {
+  --hero-min: calc(100vh - var(--header-h, 86px));
+  min-height: var(--hero-min);
+  display: flex;
+  align-items: center;
+  padding-block: clamp(32px, 5vw, 96px);
+  overflow: clip;
+}
+@supports (height: 100svh) {
+  /* svh = viewport with the mobile browser chrome showing, so the hero is
+     never taller than the screen on first paint */
+  .hero { --hero-min: calc(100svh - var(--header-h, 86px)); }
+}
+.hero > .shell { width: 100%; }
+
+.hero__grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;               /* space-between yields the exact 107px Figma gap at 1184px */
+}
+
+.hero__copy { flex: 0 1 689px; min-width: 0; }
+
+.hero__title {
+  margin-top: 20px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(40px, 5.84vw, 84px);
+  line-height: 1.008;
+  color: var(--c-forest);
+  text-wrap: balance;
+}
+.hero__title-em { font-family: var(--font-display); }
+
+.hero__lead {
+  margin-top: 23.56px;
+  font-weight: var(--fw-medium);
+  font-size: clamp(16px, 1.47vw, 21.1px);
+  line-height: 1.7;
+  color: var(--c-sage);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 37px;
+}
+
+.hero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 22px;
+  margin-top: 37px;
+  padding-inline-end: 43px;
+}
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: var(--fw-semi);
+  font-size: 14.4px;
+  line-height: 24.48px;
+  color: var(--c-sage);
+  white-space: nowrap;
+}
+.dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--c-terracotta);
+}
+
+.hero__figure { flex: none; }
+.hero__portrait {
+  width: 387.54px;
+  height: 441.8px;
+  border-radius: 243.822px;
+  object-fit: cover;
+  background: var(--c-sand);
+  transition: transform var(--t-slow) var(--ease);
+}
+
+/* Leaf band closing the hero */
+.hero-band {
+  /* the hero's own centred whitespace already separates it */
+  margin-top: 0;
+  height: 130px;
+  overflow: hidden;
+  background: var(--c-sage);
+}
+.hero-band img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* --------------------------------------------------------------------------
+   8. Intro
+   -------------------------------------------------------------------------- */
+
+.intro {
+  background: var(--c-sand);
+  padding-top: clamp(72px, 16.6vw, 239px);
+}
+
+.intro__grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;               /* space-between yields the exact 125px Figma gap at 1184px */
+}
+
+.intro__copy { flex: 0 1 583px; min-width: 0; }
+.intro__title { margin-top: 22px; font-size: clamp(28px, 3vw, 43.2px); }
+.intro__copy .body-lg { margin-top: 20.44px; }
+
+.pull-quote {
+  margin-top: 32.21px;
+  padding-inline-start: 25.4px;
+  border-inline-start: 3px solid var(--c-terracotta);
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(21px, 2.22vw, 32px);
+  line-height: 1.45;
+  color: var(--c-sage);
+}
+
+/* Offer card ------------------------------------------------------------- */
+
+.offer-card {
+  flex: none;
+  width: 478px;
+  max-width: 100%;
+  background: var(--c-cream);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-card);
+  overflow: hidden;
+}
+
+.offer-card__media {
+  height: 150px;
+  overflow: hidden;
+  background: var(--c-tan);
+}
+.offer-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.offer-card__list { padding: 34px; }
+
+.offer-card__item {
+  padding-block: 16px 17px;
+  border-bottom: 1px solid var(--c-sand);
+}
+.offer-card__item:last-child { padding-bottom: 16px; border-bottom: 0; }
+
+.offer-card__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 16.8px;
+  line-height: 19.15px;
+  color: var(--c-forest);
+}
+.offer-card__text {
+  margin-top: 2px;
+  font-size: 14.7px;
+  line-height: 25px;
+  color: var(--c-ink);
+}
+
+/* --------------------------------------------------------------------------
+   9. Rolling pills (marquee)
+   -------------------------------------------------------------------------- */
+
+.pills {
+  margin-top: clamp(64px, 13.6vw, 196px);
+  background: var(--c-sage);
+  height: 123px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.pills__viewport {
+  width: 100%;
+  overflow: hidden;
+  /* LTR here so an over-wide track overflows to the right and the
+     translate-based loop starts from a predictable origin. */
+  direction: ltr;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 72px, #000 calc(100% - 72px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 72px, #000 calc(100% - 72px), transparent 100%);
+}
+
+.pills__track {
+  display: flex;
+  align-items: center;
+  gap: 55px;
+  width: max-content;
+  direction: ltr;
+  will-change: transform;
+}
+
+/* Only animate once JS has cloned the sequence — otherwise the static list
+   must not be translated off-centre. */
+.pills.is-ready .pills__track {
+  animation: pills-scroll var(--marquee-duration, 46s) linear infinite;
+}
+.pills.is-ready:hover .pills__track,
+.pills.is-ready:focus-within .pills__track,
+.pills.is-paused .pills__track { animation-play-state: paused; }
+
+@keyframes pills-scroll {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+.pill {
+  direction: rtl;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 45.17px;
+  padding: 8.8px 18.6px 10.37px;
+  background: var(--c-cream);
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-pill);
+  filter: drop-shadow(var(--sh-btn));
+  font-weight: var(--fw-semi);
+  font-size: 16px;
+  line-height: 25.57px;
+  color: var(--c-forest);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   10. Challenge
+   -------------------------------------------------------------------------- */
+
+.challenge {
+  background: var(--c-cream);
+  padding-block: var(--sec-pad);
+  display: flex;
+  align-items: center;
+}
+
+.challenge__grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;               /* space-between yields the exact 97px Figma gap at 1184px */
+  width: 100%;
+}
+
+.challenge__copy { flex: 0 1 599px; min-width: 0; }
+.challenge__copy .h2 { margin-top: 22px; }
+.challenge__copy .body-lg { margin-top: 18.5px; }
+
+.challenge__list {
+  flex: 0 1 488px;
+  min-width: 0;
+  border-top: 1px solid var(--c-forest);
+}
+
+.challenge__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 97.86px;
+  padding: 22px 10.5px 22px 33.5px;
+  border-bottom: 1px solid var(--c-forest);
+  transition: background-color var(--t-base) var(--ease);
+}
+.challenge__item:hover { background: rgba(233, 227, 213, 0.5); }
+
+.challenge__body { flex: 1 1 auto; min-width: 0; }
+
+.challenge__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 18.6px;
+  line-height: 21.16px;
+  color: var(--c-forest);
+}
+.challenge__text {
+  margin-top: 4.59px;
+  font-size: 15.4px;
+  line-height: 26.11px;
+  color: var(--c-ink);
+}
+.challenge__num {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 35.2px;
+  line-height: 29.92px;
+  color: var(--c-forest);
+}
+
+/* Pillars (bars + words) -------------------------------------------------- */
+
+.pillars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 23px;
+  margin-top: 52px;
+  padding-block: 0 52px;
+}
+
+.pillars__bars {
+  position: relative;
+  width: 100%;
+  max-width: 596px;
+  height: 27px;
+  border-radius: 34px;
+  overflow: hidden;
+  /* Exported gradient bar (Figma "image 9", node 8843:1624).
+     The linear-gradient underneath is a visual stand-in until it is dropped in. */
+  background-image: url("assets/img/bar-gradient.png"),
+                    linear-gradient(to right, rgba(155, 165, 139, 0.75), rgba(213, 204, 185, 0.85));
+  background-size: 100% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat;
+}
+.pillars__bar {
+  position: absolute;
+  inset-block: 0;
+  left: 0;                 /* physical: the dark end sits under "קידום" */
+  border-radius: 34px;
+  background: var(--c-sage);
+  opacity: 0.59;
+}
+.pillars__bar--1 { display: none; }
+.pillars__bar--2 { width: 68.3%; }   /* 407 / 596 */
+.pillars__bar--3 { width: 30.7%; }   /* 183 / 596 */
+
+.pillars__words {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 567px;
+  gap: 16px;
+}
+.pillars__word {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 1.12;
+}
+.pillars__word--1 { color: var(--c-sage-mid); }
+.pillars__word--2 { color: var(--c-sage-light); }
+.pillars__word--3 { color: var(--c-tan); }
+
+/* --------------------------------------------------------------------------
+   11. Route
+   -------------------------------------------------------------------------- */
+
+.route {
+  background: var(--c-terracotta);
+  padding-block: var(--sec-pad);
+  display: flex;
+  align-items: center;
+}
+
+.route__grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;               /* space-between yields the exact 124px Figma gap at 1184px */
+  width: 100%;
+}
+
+.route__copy { flex: 0 1 371px; min-width: 0; }
+.route__title { margin-top: 22px; color: var(--c-ink); font-size: clamp(30px, 3.22vw, 46.4px); }
+.route__text  { margin-top: 18.8px; margin-bottom: 30px; font-size: clamp(16px, 1.2vw, 17.3px); }
+
+/* Steps ------------------------------------------------------------------ */
+
+.steps {
+  position: relative;
+  flex: 0 1 689px;
+  min-width: 0;
+}
+.steps::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 31.39px;
+  top: 10px;
+  bottom: 9.79px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--c-ink);
+}
+
+.steps__item {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 26px;
+  padding-bottom: 34px;
+}
+.steps__item:last-child { padding-bottom: 0; }
+
+.steps__badge {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--c-ink);
+  border-radius: 32px;
+  background: var(--c-cream);
+  font-weight: var(--fw-xbold);
+  font-size: 16.8px;
+  line-height: 28.56px;
+  color: var(--c-ink);
+  transition: transform var(--t-base) var(--ease), background-color var(--t-base) var(--ease);
+}
+
+.steps__card {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 29px 28px 26px;
+  background: var(--c-cream);
+  border-radius: var(--r-md);
+  filter: drop-shadow(var(--sh-btn));
+  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+.steps__item:hover .steps__card { transform: translateY(-3px); box-shadow: var(--sh-card); }
+.steps__item:hover .steps__badge { transform: scale(1.05); }
+
+.steps__kicker {
+  font-weight: var(--fw-bold);
+  font-size: 12.8px;
+  line-height: 21.76px;
+  letter-spacing: 1.536px;
+  color: var(--c-sage);
+}
+.steps__title {
+  margin-top: 7.8px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(19px, 1.56vw, 22.4px);
+  line-height: 25.54px;
+  color: var(--c-forest);
+}
+.steps__text {
+  margin-top: 7.8px;
+  font-size: 16px;
+  line-height: 27.2px;
+  color: var(--c-ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Results
+   -------------------------------------------------------------------------- */
+
+.results {
+  position: relative;
+  background: var(--c-sand);
+  padding-block: var(--sec-pad);
+  overflow: hidden;
+}
+.results__texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.results__texture img { width: 100%; height: 100%; object-fit: cover; }
+
+.results .shell { position: relative; }
+
+.results__head { margin-bottom: 54px; }
+.results__head .h2 { margin-top: 14.8px; }
+.results__head .body-lg { margin-top: 14.8px; font-size: clamp(16px, 1.24vw, 17.9px); }
+
+.results__grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+}
+
+.accordion--cards {
+  flex: 0 1 660.09px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Aside quote card */
+.results__aside {
+  position: relative;
+  flex: 0 1 487.91px;
+  min-width: 0;
+  min-height: 357.2px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--c-tan);
+}
+.results__aside-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.results__aside-quote {
+  position: relative;
+  max-width: 380.33px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(26px, 2.7vw, 39px);
+  line-height: 1.354;
+  text-align: center;
+  color: var(--c-ink);
+}
+
+/* --------------------------------------------------------------------------
+   13. Accordion (shared)
+   -------------------------------------------------------------------------- */
+
+.acc {
+  background: var(--c-cream);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-soft);
+  overflow: hidden;
+  transition: box-shadow var(--t-slow) var(--ease), transform var(--t-base) var(--ease);
+}
+.acc.is-open { box-shadow: var(--sh-card); }
+.acc:hover { transform: translateY(-2px); }
+
+.acc__heading { font: inherit; }
+
+.acc__trigger {
+  display: flex;
+  align-items: center;
+  gap: 11.9px;
+  width: 100%;
+  padding: 19px 22px 19px 19.93px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: start;
+  transition: background-color var(--t-base) var(--ease);
+}
+.acc__trigger:hover { background: rgba(233, 227, 213, 0.45); }
+.acc__trigger:active { background: rgba(233, 227, 213, 0.7); }
+.acc__trigger:focus-visible { outline-offset: -3px; }
+
+.acc__badge {
+  flex: none;
+  position: relative;
+  width: 36.1px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-badge);
+  background: var(--c-cream);
+  transition: background-color var(--t-base) var(--ease);
+}
+.acc.is-open .acc__badge { background: var(--c-forest); }
+
+.acc__check {
+  grid-area: 1 / 1;
+  width: 18px;
+  height: 18px;
+  transition: opacity var(--t-base) var(--ease);
+}
+.acc__check--on  { opacity: 0; }
+.acc__check--off { opacity: 1; }
+.acc.is-open .acc__check--on  { opacity: 1; }
+.acc.is-open .acc__check--off { opacity: 0; }
+
+.acc__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 18.2px;
+  line-height: 20.79px;
+  color: var(--c-forest);
+  text-align: start;
+}
+
+.acc__chevron {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--c-terracotta);
+  border-left: 2px solid var(--c-terracotta);
+  transform: rotate(45deg);
+  transition: transform var(--t-slow) var(--ease);
+}
+.acc.is-open .acc__chevron { transform: rotate(-135deg); }
+
+/* Panel — height animated via grid-template-rows so nothing is ever clipped */
+.acc__panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: grid-template-rows var(--t-slow) var(--ease), opacity var(--t-base) var(--ease);
+}
+.acc__inner { overflow: hidden; min-height: 0; }
+
+.js .acc__panel { grid-template-rows: 0fr; opacity: 0; }
+.js .acc.is-open > .acc__panel,
+.js .faq__item.is-open > .acc__panel { grid-template-rows: 1fr; opacity: 1; }
+
+.acc .acc__inner > * { padding-inline: 22px 19.93px; }
+.acc .acc__inner > *:last-child { padding-bottom: 19px; }
+
+.acc__text {
+  font-size: 16px;
+  line-height: 27.2px;
+  color: var(--c-ink);
+  padding-bottom: 11.9px;
+}
+
+.acc__media {
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-media);
+  padding: 1px;
+  overflow: hidden;
+  margin-inline: 22px 19.93px;
+  padding-inline: 1px !important;
+}
+.acc__media img {
+  width: 100%;
+  height: 154px;
+  object-fit: cover;
+  border-radius: 13px;
+  background: var(--c-sand);
+  transition: transform 480ms var(--ease);
+}
+.acc__media:hover img { transform: scale(1.03); }
+
+/* --------------------------------------------------------------------------
+   14. Recommendations
+   -------------------------------------------------------------------------- */
+
+.recs {
+  background: var(--c-cream);
+  padding-block: 107px;
+}
+
+.recs__head { text-align: center; margin-bottom: 48px; }
+.recs__head .h2 { margin-top: 14.8px; }
+
+.recs__slider { position: relative; }
+
+.recs__viewport {
+  position: relative;          /* offsetParent for the texture maths in JS */
+  overflow: hidden;
+  /* room for the card shadow / lift on hover */
+  margin-inline: -6px;
+  padding: 6px;
+}
+
+/* Without JS the arrows can't work — fall back to a scrollable row so all
+   five recommendations stay reachable. */
+html:not(.js) .recs__viewport { overflow-x: auto; }
+html:not(.js) .recs__controls { display: none; }
+
+.recs__track {
+  --cards-per-view: 3;
+  --card-gap: 22px;
+  display: flex;
+  gap: var(--card-gap);
+  transition: transform 520ms var(--ease);
+  will-change: transform;
+}
+
+.rec {
+  position: relative;
+  flex: 0 0 calc((100% - (var(--cards-per-view) - 1) * var(--card-gap)) / var(--cards-per-view));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 268px;
+  padding: 28px 32px;
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+
+  /* One shared paper texture spanning the whole carousel rather than a copy
+     per card: the image is sized to the viewport (--tex-w) and each card
+     offsets it by its own distance from the viewport's edge (--tex-x), so the
+     cards read as windows onto a single stationary sheet. JS keeps --tex-x in
+     sync as the track slides; the matching transition means the texture holds
+     still while the cards move across it. Without JS the fallback is simply
+     one texture per card. */
+  background-color: var(--c-cream);
+  background-image: url("assets/img/Papertexture.png");
+  background-repeat: no-repeat;
+  background-size: var(--tex-w, 100%) 100%;
+  background-position: var(--tex-x, 0px) center;
+
+  transition: transform var(--t-base) var(--ease),
+              box-shadow var(--t-base) var(--ease),
+              border-color var(--t-base) var(--ease),
+              background-position 520ms var(--ease);
+}
+.rec:hover { box-shadow: var(--sh-soft); border-color: var(--c-tan); }
+
+.rec__quote-mark {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 73.6px;
+  line-height: 44.16px;
+  height: 44.5px;
+  color: var(--c-terracotta);
+}
+.rec__quote-mark--sm { font-size: 51.2px; line-height: 30.72px; height: 30.5px; color: var(--c-sand); }
+
+.rec__quote {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(23px, 2.28vw, 32.8px);
+  line-height: 1.42;
+  color: var(--c-forest);
+}
+.rec__quote--sm {
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  font-size: clamp(15px, 1.15vw, 16.6px);
+  line-height: 1.7;
+  color: var(--c-ink);
+}
+.rec__quote[dir="ltr"] { text-align: left; }
+/* the quote mark follows the card's own reading direction */
+.rec:has(.rec__quote[dir="ltr"]) .rec__quote-mark { text-align: left; }
+
+/* Carousel controls ------------------------------------------------------ */
+
+.recs__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.carousel-btn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-pill);
+  background: var(--c-cream);
+  cursor: pointer;
+  transition: background-color var(--t-base) var(--ease),
+              border-color var(--t-base) var(--ease),
+              box-shadow var(--t-base) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+.carousel-btn:hover { background: var(--c-sand); border-color: var(--c-tan); box-shadow: var(--sh-soft); }
+.carousel-btn:active { transform: scale(0.94); box-shadow: none; }
+.carousel-btn[disabled] { opacity: 0.4; pointer-events: none; cursor: not-allowed; }
+
+.carousel-btn__icon {
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--c-terracotta);
+  border-left: 2px solid var(--c-terracotta);
+  transition: transform var(--t-base) var(--ease);
+}
+/* RTL: "previous" points to the right, "next" points to the left */
+.carousel-btn__icon--prev { transform: rotate(-135deg) translate(-1px, -1px); }
+.carousel-btn__icon--next { transform: rotate(45deg) translate(-1px, -1px); }
+.carousel-btn:hover .carousel-btn__icon--prev { transform: rotate(-135deg) translate(-3px, -3px); }
+.carousel-btn:hover .carousel-btn__icon--next { transform: rotate(45deg) translate(1px, 1px); }
+
+/* FAQ -------------------------------------------------------------------- */
+
+.faq__heading {
+  margin-top: 48px;
+  padding-top: 42px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(26px, 2.56vw, 36.8px);
+  line-height: 1.14;
+  color: var(--c-forest);
+}
+
+.faq {
+  width: 100%;
+  max-width: 820px;
+  margin: 48px auto 0;
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--c-sand);
+  transition: background-color var(--t-base) var(--ease);
+}
+
+.faq__q { font: inherit; }
+
+.faq__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 22px 4px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: start;
+}
+.faq__trigger:focus-visible { outline-offset: -2px; }
+
+.faq__label {
+  font-weight: var(--fw-semi);
+  font-size: clamp(16px, 1.24vw, 17.9px);
+  line-height: 1.4;
+  color: var(--c-forest);
+  text-align: start;
+  transition: color var(--t-base) var(--ease);
+}
+.faq__trigger:hover .faq__label { color: var(--c-sage); }
+
+/* plus → minus indicator */
+.faq__icon {
+  position: relative;
+  flex: none;
+  order: 2;              /* pushed to the far (visual) left in RTL */
+  width: 26px;
+  height: 26px;
+}
+.faq__icon::before,
+.faq__icon::after {
+  content: "";
+  position: absolute;
+  background: var(--c-terracotta);
+  border-radius: 2px;
+  transition: transform var(--t-slow) var(--ease), opacity var(--t-base) var(--ease);
+}
+.faq__icon::before { inset-inline: 0; top: 12px; height: 2px; }
+.faq__icon::after  { inset-block: 0; right: 12px; width: 2px; }
+
+.faq__item.is-open .faq__icon::after { transform: rotate(90deg); opacity: 0; }
+
+.faq__a {
+  padding: 0 4px 22px;
+  font-size: 14.4px;
+  line-height: 24.48px;
+  color: var(--c-ink);
+}
+
+/* --------------------------------------------------------------------------
+   15. Contact
+   -------------------------------------------------------------------------- */
+
+.contact {
+  background: var(--c-sage);
+  padding-block: var(--sec-pad);
+}
+
+.contact__grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 60px;
+}
+
+.contact__copy { flex: 0 1 477.69px; min-width: 0; }
+.contact__title { margin-top: 22px; font-size: clamp(30px, 3.11vw, 44.8px); }
+.contact__copy .body-lg { margin-top: 18.8px; font-size: clamp(16px, 1.2vw, 17.3px); }
+
+.contact__card {
+  position: relative;
+  flex: 0 1 646.31px;
+  min-width: 0;
+  padding: 44px;
+  background: var(--c-cream);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-card);
+}
+
+/* Form ------------------------------------------------------------------- */
+
+.form { display: flex; flex-direction: column; }
+
+.field { display: flex; flex-direction: column; gap: 7.19px; }
+.field--area { padding-block: 17.97px 27.18px; }
+
+.field-row {
+  display: flex;
+  gap: 18px;
+  padding-block: 18px;
+}
+.field-row .field { flex: 1 1 0; min-width: 0; }
+
+.field__label {
+  font-weight: var(--fw-semi);
+  font-size: 14.7px;
+  line-height: 25px;
+  color: var(--c-forest);
+  cursor: pointer;
+}
+
+.field__input {
+  width: 100%;
+  padding: 14.6px 17px;
+  background: var(--c-cream);
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--c-ink);
+  transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), background-color var(--t-base) var(--ease);
+}
+.field__input::placeholder { color: var(--c-tan); opacity: 1; }
+.field__input:hover { border-color: var(--c-tan); }
+.field__input:focus {
+  outline: none;
+  border-color: var(--c-sage);
+  box-shadow: 0 0 0 3px rgba(100, 120, 92, 0.16);
+  background: #fff;
+}
+.field__input:disabled { opacity: 0.55; cursor: not-allowed; }
+.field__input--ltr { direction: ltr; text-align: right; }
+
+.field__textarea { min-height: 96px; resize: vertical; }
+
+/* honeypot — invisible to people, still fillable by bots.
+   Clipped rather than pushed off-screen so it can never widen the page. */
+.form__honey {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+
+.form__status {
+  margin-top: 14px;
+  padding: 11px 14px;
+  border: 1px solid var(--c-sand);
+  border-radius: var(--r-md);
+  font-size: 14.4px;
+  line-height: 1.6;
+  text-align: center;
+}
+.form__status--pending { color: var(--c-sage); background: rgba(233, 227, 213, 0.5); }
+.form__status--ok      { color: var(--c-forest); background: rgba(100, 120, 92, 0.14); border-color: rgba(100, 120, 92, 0.35); }
+.form__status--error   { color: var(--c-ink); background: rgba(177, 114, 83, 0.12); border-color: rgba(177, 114, 83, 0.4); }
+.form__status a { text-decoration: underline; }
+
+.form__note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 5.9px;
+  font-size: 13.4px;
+  line-height: 22.85px;
+  color: var(--c-ink);
+}
+.form__note img { flex: none; width: 16px; height: 16px; }
+
+/* --------------------------------------------------------------------------
+   16. Footer
+   -------------------------------------------------------------------------- */
+
+.site-footer {
+  background: var(--c-terracotta);
+  padding-block: 92px 31px;
+  color: var(--c-sand);
+}
+
+.footer__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  padding-bottom: 30px;
+}
+
+.footer__brand { max-width: 454.58px; }
+.footer__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 11.19px;
+  justify-content: flex-start;
+}
+.footer__mark { width: 38px; height: 48px; object-fit: contain; }
+.footer__brand-text { display: flex; flex-direction: column; }
+.footer__name {
+  font-weight: var(--fw-xbold);
+  font-size: 21.6px;
+  line-height: 21.6px;
+  letter-spacing: 0.216px;
+  color: var(--c-sand);
+}
+.footer__tagline {
+  margin-top: 2px;
+  font-weight: var(--fw-semi);
+  font-size: 9.9px;
+  line-height: 9.92px;
+  letter-spacing: 2.778px;
+  color: var(--c-tan);
+}
+.footer__desc {
+  max-width: 293.5px;
+  margin-top: 16px;
+  font-size: 15.4px;
+  line-height: 26.11px;
+  color: var(--c-tan);
+}
+
+.footer__nav-title {
+  font-weight: var(--fw-bold);
+  font-size: 13.8px;
+  line-height: 23.39px;
+  letter-spacing: 1.651px;
+  color: var(--c-ink);
+}
+.footer__nav-list { margin-top: 20.3px; display: flex; flex-direction: column; gap: 8.6px; }
+
+.footer__link {
+  display: inline-block;
+  font-size: 15.4px;
+  line-height: 26.11px;
+  color: var(--c-sand);
+  transition: color var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+}
+.footer__link:hover { color: #fff; transform: translateX(3px); }
+.footer__link:active { color: var(--c-tan); }
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 23px 22px;
+  border-top: 1px solid var(--c-sand);
+}
+.footer__meta {
+  font-size: 13.8px;
+  line-height: 23.39px;
+  color: var(--c-ink);
+}
+
+/* --------------------------------------------------------------------------
+   17. Scroll reveal
+   -------------------------------------------------------------------------- */
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 620ms var(--ease), transform 620ms var(--ease);
+  transition-delay: calc(var(--reveal-delay, 0) * 110ms);
+}
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   17b. Geometric stand-ins for the four SVG icons not yet exported
+   (checkmark + CTA arrow). They only paint while the real SVG is absent, so
+   dropping the exported files into assets/icons/ silently takes over.
+   -------------------------------------------------------------------------- */
+
+.acc__badge:has(img.is-missing)::after {
+  content: "";
+  grid-area: 1 / 1;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--c-ink);
+  border-bottom: 2px solid var(--c-ink);
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+.acc.is-open .acc__badge:has(img.is-missing)::after {
+  border-color: var(--c-cream);
+}
+
+.btn:has(> img.btn__icon.is-missing)::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--t-base) var(--ease);
+}
+.btn:has(> img.btn__icon.is-missing):hover::before { transform: rotate(45deg) translate(-2px, 2px); }
+
+/* --------------------------------------------------------------------------
+   18. Missing-asset placeholder
+   Keeps the layout intact (and quiet) until the exported Figma assets are
+   dropped into assets/. Remove once every file is in place.
+   -------------------------------------------------------------------------- */
+
+img.is-missing {
+  visibility: hidden;
+}
+.acc__media:has(img.is-missing),
+.offer-card__media:has(img.is-missing),
+.hero__figure:has(img.is-missing) { background: var(--c-sand); }
+
+/* --------------------------------------------------------------------------
+   19. Desktop canvas heights (match the Figma frame exactly ≥1200px)
+   -------------------------------------------------------------------------- */
+
+@media (min-width: 1200px) {
+  .challenge { min-height: 1020px; }
+  .route     { min-height: 1020px; }
+  .results   { min-height: 1266px; display: flex; align-items: center; flex-direction: column; justify-content: center; }
+  .recs      { min-height: 1344px; }
+  .contact   { min-height: 938px; display: flex; align-items: center; }
+  .contact .shell, .results .shell { width: 100%; }
+}
+
+/* --------------------------------------------------------------------------
+   20. Responsive — below 1200px
+   Shared chrome: tighter gutters and the collapsed navigation. Column
+   stacking lives in §21 (mobile) — tablets keep their two-column structure,
+   tuned in §20b.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1199px) {
+  :root { --sec-pad: clamp(72px, 9vw, 110px); --shell-pad: 24px; }
+
+  .nav-toggle { display: flex; }
+
+  .nav {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 16px 24px 24px;
+    background: rgba(242, 239, 230, 0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--sh-header);
+    transform-origin: top;
+    display: none;
+  }
+  .nav.is-open { display: flex; }
+
+  .nav__list { flex-direction: column; align-items: stretch; gap: 2px; }
+  .nav__link { padding: 12px 4px; font-size: 17px; border-bottom: 1px solid var(--c-sand); }
+  .nav__link::after { display: none; }
+  .nav__cta { align-self: flex-start; margin-top: 12px; }
+
+  .header__shell { position: relative; }
+
+  .hero__tags { padding-inline-end: 0; }
+
+  /* Challenge */
+  .pillars { align-items: stretch; }
+  .pillars__bars, .pillars__words { max-width: none; }
+
+  /* Recommendations */
+  .recs__track { --cards-per-view: 2; }
+}
+
+/* --------------------------------------------------------------------------
+   20b. Tablet (768–1199px) — keep the two-column structure
+   The desktop `flex: 0 1 <width>px` bases already shrink; these rules just
+   rebalance them for the narrower column and stop any block from collapsing
+   below a readable width.
+   -------------------------------------------------------------------------- */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+
+  .hero__grid,
+  .intro__grid,
+  .challenge__grid,
+  .route__grid,
+  .contact__grid { gap: clamp(24px, 3.6vw, 44px); }
+
+  .hero__copy,
+  .intro__copy,
+  .challenge__copy,
+  .steps,
+  .contact__card { flex: 1 1 auto; min-width: 0; }
+
+  .hero__figure   { flex: 0 1 320px; min-width: 220px; align-self: center; }
+  .hero__portrait { width: 100%; height: auto; aspect-ratio: 387.54 / 441.8; }
+  .hero__actions .btn { flex: 1 1 auto; }
+
+  .offer-card       { flex: 0 1 420px; width: auto; min-width: 260px; }
+  .offer-card__list { padding: 26px; }
+
+  .challenge__list { flex: 0 1 430px; min-width: 280px; }
+  .challenge__item { padding-inline: 8px 20px; }
+  .pillars__word   { font-size: clamp(32px, 5.2vw, 58px); }
+
+  .route__copy { flex: 0 1 330px; min-width: 250px; }
+
+  .contact__copy { flex: 0 1 340px; min-width: 240px; }
+  .contact__card { padding: 32px; }
+
+  /* Results: the quote card needs real width, so this pair stacks earlier. */
+  .results__grid      { gap: 26px; }
+  .accordion--cards   { flex: 1 1 auto; min-width: 0; }
+  .results__aside     { flex: 0 1 340px; min-width: 260px; }
+  .results__aside-quote { font-size: clamp(22px, 3.2vw, 32px); }
+}
+
+@media (min-width: 768px) and (max-width: 919px) {
+  .results__grid {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 26px;
+  }
+  .accordion--cards, .results__aside { flex: 0 0 auto; width: 100%; }
+  .results__aside { min-height: 240px; }
+  .results__aside-quote { font-size: clamp(26px, 3.6vw, 34px); }
+}
+
+/* --------------------------------------------------------------------------
+   21. Responsive — mobile (<768px)
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  :root { --shell-pad: 20px; --sec-pad: 64px; }
+
+  html { scroll-padding-top: 80px; }
+
+  /* --- Stacked columns -------------------------------------------------
+     Every two-column grid becomes a single column. The desktop
+     `flex: 0 1 <width>px` bases must be reset: in a column flex container
+     flex-basis sizes the MAIN axis, i.e. it would lock each block to its
+     desktop width as a fixed HEIGHT and leave dead space underneath. */
+  .hero__grid,
+  .intro__grid,
+  .challenge__grid,
+  .route__grid,
+  .results__grid,
+  .contact__grid {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 36px;
+  }
+  .hero__grid { gap: 30px; }
+
+  .hero__copy, .hero__figure,
+  .intro__copy, .offer-card,
+  .challenge__copy, .challenge__list,
+  .route__copy, .steps,
+  .accordion--cards, .results__aside,
+  .contact__copy, .contact__card {
+    flex: 0 0 auto;
+  }
+
+  .intro__copy, .offer-card,
+  .challenge__copy, .challenge__list,
+  .route__copy, .steps,
+  .accordion--cards, .results__aside,
+  .contact__copy, .contact__card,
+  .hero__copy { width: 100%; }
+
+  .hero__figure { align-self: center; width: auto; }
+  /* Sized from the viewport height so the stacked hero still resolves to
+     roughly one screen on a phone instead of overflowing it. */
+  .hero__portrait { width: auto; height: clamp(160px, 28vh, 300px); aspect-ratio: 387.54 / 441.8; }
+
+  .footer__top { flex-direction: row; }
+
+  .header__shell { min-height: 60px; gap: 12px; }
+  .logo__name { font-size: 24px; line-height: 22px; }
+  .logo__tagline { font-size: 9.6px; }
+
+  .hero { padding-block: 24px; }
+  .hero__title { margin-top: 16px; }
+  .hero__lead { margin-top: 18px; }
+  .hero__actions { margin-top: 28px; }
+  .hero__actions .btn { flex: 1 1 100%; }
+  .hero__tags { margin-top: 28px; gap: 10px 16px; }
+  .hero__tag { font-size: 13.6px; gap: 9px; }
+
+  .hero-band { height: 96px; }
+
+  .intro { padding-top: 64px; }
+  .pull-quote { margin-top: 24px; padding-inline-start: 18px; }
+
+  .offer-card__list { padding: 24px; }
+  .offer-card__media { height: 120px; }
+
+  .pills { margin-top: 56px; height: 104px; }
+  .pills__viewport {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+  }
+  .pills__track { gap: 24px; }
+  .pill { height: 42px; padding: 8px 16px; font-size: 14.6px; }
+
+  .challenge__item { padding: 18px 18px 18px 6px; gap: 14px; min-height: 0; }
+  .challenge__num { font-size: 28px; }
+
+  .pillars { margin-top: 40px; padding-bottom: 8px; gap: 14px; }
+  .pillars__bars { height: 20px; }
+  .pillars__words { gap: 8px; }
+  .pillars__word { font-size: clamp(26px, 9vw, 40px); }
+
+  .steps::before { inset-inline-start: 23px; }
+  .steps__item { gap: 16px; padding-bottom: 24px; }
+  .steps__badge { width: 48px; height: 48px; border-radius: 24px; font-size: 15px; }
+  .steps__card { padding: 22px 20px; }
+
+  .results__head { margin-bottom: 32px; }
+  .results__grid { gap: 22px; }
+  .results__aside { min-height: 260px; padding: 24px; }
+  .results__aside-mark { width: 140px; height: 140px; }
+
+  .acc__trigger { padding: 16px; gap: 10px; }
+  .acc__title { font-size: 16.4px; line-height: 1.3; }
+  .acc .acc__inner > * { padding-inline: 16px; }
+  .acc .acc__inner > *:last-child { padding-bottom: 16px; }
+  .acc__media { margin-inline: 16px; }
+  .acc__media img { height: 132px; }
+
+  .recs { padding-block: 64px; }
+  .recs__track { --cards-per-view: 1; --card-gap: 16px; }
+  .rec { padding: 24px; min-height: 0; }
+  .recs__controls { margin-top: 22px; }
+  .faq__heading { margin-top: 32px; padding-top: 24px; }
+  .faq { margin-top: 24px; }
+  .faq__trigger { padding: 18px 2px; gap: 12px; }
+
+  .contact__card { padding: 24px; }
+  .field-row { flex-direction: column; gap: 0; padding-block: 0; }
+  .field-row .field { padding-block: 18px 0; }
+  .field--area { padding-block: 18px; }
+
+  .site-footer { padding-block: 56px 24px; }
+  .footer__top { flex-direction: column-reverse; align-items: flex-start; gap: 32px; padding-bottom: 24px; }
+  .footer__brand, .footer__desc { max-width: none; }
+  .footer__desc { margin-inline-start: 0; }
+  .footer__bottom { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+
+/* --------------------------------------------------------------------------
+   22. Responsive — small mobile (<480px)
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 479px) {
+  :root { --shell-pad: 16px; }
+
+  .logo__name { font-size: 21px; letter-spacing: -1px; }
+  .logo__mark { width: 28px; height: 36px; }
+  .logo__mark img { width: 23px; height: 32px; }
+
+  .hero__portrait { max-width: 78vw; }
+  /* keep the tags as a wrapping horizontal row (2 lines is fine) */
+  .hero__tags { gap: 8px 14px; }
+  .hero__tag { font-size: 13px; gap: 8px; }
+
+  .challenge__item { align-items: flex-start; }
+  .challenge__num { font-size: 24px; line-height: 1; padding-top: 2px; }
+
+  .pillars__words { flex-direction: column; align-items: center; gap: 0; }
+
+  .acc__media img { height: 112px; }
+}
+
+/* --------------------------------------------------------------------------
+   23. Reduced motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js [data-reveal] { opacity: 1; transform: none; }
+
+  /* Marquee becomes a plain, horizontally scrollable row */
+  .pills.is-ready .pills__track { animation: none; transform: none; }
+
+  /* Carousel: no auto-rotation (JS), and no sliding transition */
+  .recs__track { transition: none; }
+  .rec { transition: none; }
+  .pills__viewport {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scrollbar-width: thin;
+  }
+  .pills__track { padding-inline: 24px; }
+}
