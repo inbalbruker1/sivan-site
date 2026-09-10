@@ -422,7 +422,7 @@
      POST to the same service via its `action` attribute.
      ------------------------------------------------------------------ */
 
-  var CONTACT_EMAIL = "inbal.bruker@tipranks.com";
+  var CONTACT_EMAIL = "sivish85@gmail.com";
 
   var form = document.querySelector(".form");
   if (form) {
